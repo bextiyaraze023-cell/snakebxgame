@@ -1,0 +1,256 @@
+<html><head>
+<meta charset="UTF-8">
+<title>Snake Oyunu</title>
+<style>
+  body {
+    background: url('https://static.vecteezy.com/system/resources/previews/014/976/344/non_2x/green-snake-skin-seamless-pattern-background-free-vector.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+    margin:0;
+  }
+
+canvas {
+  border:2px solid white;
+  background:#111;
+  display:block;          /* hemise gorunecek */
+  margin:5px auto 0 auto; /* mərkəzləşdir */
+}
+
+  .color-circle {
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    display:inline-block;
+    margin:5px;
+    border:2px solid white;
+    cursor:pointer;
+  }
+  .color-circle.selected {
+    box-shadow:0 0 10px white;
+  }
+
+  /* Container for both menus */
+  #menusContainer {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:30px;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    z-index:10;
+  }
+
+  /* Common style for menus */
+  .menuBox {
+    background: rgba(0,0,0,0.8);
+    padding:30px;
+    border:2px solid white;
+    text-align:center;
+    color:white;
+  }
+
+  #menu2 p {
+    margin-top:15px;
+    font-size:14px;
+  }
+    #menu {
+  width: 300px;              
+  height: 250px;            
+  background: rgba(0,0,0,0.8);
+  border: 2px solid white;
+  padding: 20px;
+  overflow-y: auto;          
+  position: relative;         
+  box-sizing: border-box; 
+  }
+  #menu2 {
+  width: 300px;               
+  height: 250px;             
+  background: rgba(0,0,0,0.8);
+  border: 2px solid white;
+  padding: 20px;
+  overflow-y: auto;          
+  position: relative;        
+  box-sizing: border-box;     
+}
+ #playBtn {
+  background-color: #28a745;  
+  color: white;               
+  font-size: 22px;            
+  font-weight: bold;       
+  padding: 15px 40px;        
+  border: none;              
+  border-radius: 12px;        
+  cursor: pointer;            
+  transition: all 0.3s ease;  
+  box-shadow: 0 5px #1c7430;  
+}
+
+#playBtn:hover {
+  background-color: #218838;  
+  transform: translateY(-2px); 
+  box-shadow: 0 7px #1c7430;  
+}
+
+#playBtn:active {
+  transform: translateY(1px); 
+  box-shadow: 0 3px #1c7430;   
+}
+
+</style>
+</head>
+<body>
+
+<!-- Menus Container -->
+<div id="menusContainer">
+  <!-- Menu1 -->
+  <div id="menu" class="menuBox">
+<h1 style="  color: white; text-shadow: 2px 2px 4px rgb(68, 2, 2), 4px 4px 8px rgb(68, 2, 2), 6px 6px 12px rgb(68, 2, 2);">Snake bX Game</h1>
+    <button id="playBtn">Play</button>
+  </div>
+
+  <!-- Menu2 -->
+  <div id="menu2" class="menuBox">
+    <h1>Options</h1>
+    <label for="speed">Speed: <span id="speedVal">Normal</span></label><br>
+    <input type="range" id="speed" min="2" max="15" value="15"><br>
+    <!-- Colors -->
+    <fieldset>
+          <legend>Color</legend>
+    <div class="color-circle selected" data-color="lime" style="background: lime;"></div>
+    <div class="color-circle" data-color="blue" style="background: blue;"></div>
+    <div class="color-circle" data-color="yellow" style="background: yellow;"></div>
+    <div class="color-circle" data-color="purple" style="background: purple;"></div>
+    <div class="color-circle" data-color="red" style="background: red;"></div>
+        <div class="color-circle" data-color="white" style="background: white;"></div>
+    </fieldset>
+    <p>The game is still being developed.</p>
+  </div>
+</div>
+
+<!-- Canvas -->
+<canvas id="gameCanvas" width="800" height="650"></canvas>
+
+<script>
+
+  var canvas = document.getElementById("gameCanvas");
+  var ctx = canvas.getContext("2d");
+  var grid = 16;
+  var count = 0;
+  var speed = 15;
+  var playing = false;
+
+  var snakeColor = "lime"; // default color
+
+  var snake = {
+    x:160, y:160,
+    dx:grid, dy:0,
+    cells:[],
+    maxCells:4
+  };
+
+  var apple = {x:320, y:320};
+  var snakeLength = 4;
+
+  function getRandomInt(min,max){
+    return Math.floor(Math.random()*(max-min))+min;
+  }
+
+  function resetGame(){
+    snake.x=160; snake.y=160; snake.dx=grid; snake.dy=0;
+    snake.cells=[]; snake.maxCells=snakeLength;
+    apple.x=getRandomInt(0,25)*grid;
+    apple.y=getRandomInt(0,25)*grid;
+  }
+
+  // Colors selection
+  var colorCircles = document.querySelectorAll(".color-circle");
+  colorCircles.forEach(function(c){
+    c.addEventListener("click", function(){
+      snakeColor = this.getAttribute("data-color");
+      colorCircles.forEach(cc=>cc.classList.remove("selected"));
+      this.classList.add("selected");
+    });
+  });
+
+  // Play button
+  document.getElementById("playBtn").addEventListener("click", function(){
+    playing = true;
+    document.getElementById("menusContainer").style.display="none";
+    resetGame();
+  });
+
+  // Speed slider
+  var speedSlider = document.getElementById("speed");
+  var speedVal = document.getElementById("speedVal");
+  speedSlider.addEventListener("input", function(){
+    speed = parseInt(this.value);
+    speedVal.textContent = speed;
+  });
+
+  // Keyboard controls
+  document.addEventListener("keydown", function(e){
+    if(!playing) return;
+    if((e.key==="ArrowLeft"||e.key==="a") && snake.dx===0){ snake.dx=-grid; snake.dy=0; }
+    else if((e.key==="ArrowUp"||e.key==="w") && snake.dy===0){ snake.dy=-grid; snake.dx=0; }
+    else if((e.key==="ArrowRight"||e.key==="d") && snake.dx===0){ snake.dx=grid; snake.dy=0; }
+    else if((e.key==="ArrowDown"||e.key==="s") && snake.dy===0){ snake.dy=grid; snake.dx=0; }
+  });
+
+  // Game loop
+  function loop(){
+    requestAnimationFrame(loop);
+    if(!playing) return;
+    if(++count<speed) return;
+    count=0;
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    snake.x+=snake.dx;
+    snake.y+=snake.dy;
+
+    // wall collision
+    if(snake.x<0 || snake.x>=canvas.width || snake.y<0 || snake.y>=canvas.height){
+      playing=false;
+      document.getElementById("menusContainer").style.display="flex";
+      resetGame();
+      return;
+    }
+
+    snake.cells.unshift({x:snake.x, y:snake.y});
+    if(snake.cells.length>snake.maxCells) snake.cells.pop();
+
+    // draw apple
+    ctx.fillStyle="red";
+    ctx.fillRect(apple.x, apple.y, grid-1, grid-1);
+
+    // draw snake
+    ctx.fillStyle=snakeColor;
+    snake.cells.forEach(function(cell,index){
+      ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
+
+      // eat apple
+      if(cell.x===apple.x && cell.y===apple.y){
+        snake.maxCells++;
+        apple.x=getRandomInt(0,25)*grid;
+        apple.y=getRandomInt(0,25)*grid;
+      }
+
+      // self collision
+      for(var i=index+1;i<snake.cells.length;i++){
+        if(cell.x===snake.cells[i].x && cell.y===snake.cells[i].y){
+          playing=false;
+          document.getElementById("menusContainer").style.display="flex";
+          resetGame();
+        }
+      }
+    });
+  }
+
+  requestAnimationFrame(loop);
+</script>
+
+
+</body></html>
