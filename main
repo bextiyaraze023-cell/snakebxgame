@@ -4,33 +4,93 @@
 <meta charset="UTF-8">
 <title>Snake Oyunu</title>
 <style>
-html, body {margin:0; padding:0; overflow:hidden; height:100%; width:100%; font-family:Arial,sans-serif; background:black;}
-canvas {display:block; background:#111;}
-#gameTitle {position:absolute; top:50px; left:50%; transform:translateX(-50%); font-size:48px; color:white; text-shadow:2px 2px 4px rgb(68,2,2),4px 4px 8px rgb(68,2,2),6px 6px 12px rgb(68,2,2); z-index:10; text-align:center;}
-#menusContainer {display:flex; justify-content:center; align-items:flex-start; gap:30px; position:absolute; top:150px; left:50%; transform:translateX(-50%); z-index:10;}
-.menuBox {background: rgba(0,0,0,0.8); padding:20px; border:2px solid white; text-align:center; color:white; width:300px; height:250px; overflow-y:auto; box-sizing:border-box;}
-#playBtn {display:block; margin:20px auto; background-color:#28a745; color:white; font-size:26px; font-weight:bold; padding:20px 60px; border:none; border-radius:15px; cursor:pointer; box-shadow:0 5px #1c7430; transition:all 0.3s ease;}
+
+html, body {
+  margin:0; padding:0; overflow:hidden;
+  height:100%; width:100%;
+  font-family:Arial, sans-serif;
+  background:black;
+}
+canvas {
+  display:block;
+  background:#111;
+}
+
+/* ==== BAŞLIQ ==== */
+#gameTitle {
+  position:absolute;
+  top:50px; left:50%;
+  transform:translateX(-50%);
+  font-size:48px;
+  color:white;
+  text-shadow:2px 2px 4px rgb(68,2,2),
+               4px 4px 8px rgb(68,2,2),
+               6px 6px 12px rgb(68,2,2);
+  z-index:10; text-align:center;
+}
+
+/* ==== MENYULAR ==== */
+#menusContainer {
+  display:flex; justify-content:center; align-items:flex-start; gap:30px;
+  position:absolute; top:150px; left:50%; transform:translateX(-50%);
+  z-index:10;
+}
+.menuBox {
+  background: rgba(0,0,0,0.8);
+  padding:20px;
+  border:2px solid white;
+  text-align:center;
+  color:white;
+  width:300px; height:250px;
+  overflow-y:auto;
+  box-sizing:border-box;
+}
+
+/* ==== play duymesi ==== */
+#playBtn {
+  display:block; margin:20px auto;
+  background-color:#28a745; color:white;
+  font-size:26px; font-weight:bold;
+  padding:20px 60px;
+  border:none; border-radius:15px;
+  cursor:pointer; box-shadow:0 5px #1c7430;
+  transition:all 0.3s ease;
+}
 #playBtn:hover {background-color:#218838; transform:translateY(-2px); box-shadow:0 7px #1c7430;}
 #playBtn:active {transform:translateY(1px); box-shadow:0 3px #1c7430;}
-.color-circle {width:40px; height:40px; border-radius:50%; display:inline-block; margin:5px; border:2px solid white; cursor:pointer;}
+
+/* ==== reng secimi ==== */
+.color-circle {
+  width:40px; height:40px; border-radius:50%;
+  display:inline-block; margin:5px;
+  border:2px solid white; cursor:pointer;
+}
 .color-circle.selected {box-shadow:0 0 10px white;}
-input[type="text"] {width:80%; padding:8px; font-size:16px; margin-top:10px; border-radius:5px; border:none;}
+input[type="text"] {
+  width:80%; padding:8px; font-size:16px;
+  margin-top:10px; border-radius:5px; border:none;
+}
 </style>
 </head>
 <body>
 
+<!-- ==== gmaename ==== -->
 <div id="gameTitle">Snake bX Game</div>
 
+<!-- ==== menu ==== -->
 <div id="menusContainer">
+
+  <!-- menu one {realyy?} -->
   <div style="overflow:hidden;" id="menu" class="menuBox">
     <h2>Enter Nickname</h2>
     <input type="text" id="nickname" placeholder="Player">
     <button id="playBtn">Play</button>
   </div>
 
+  <!-- options -->
   <div id="menu2" class="menuBox">
     <h2>Options</h2>
-    <label for="speed">Speed: <span id="speedVal">Normal</span></label><br>
+    <label for="speed">Speed: <span id="speedVal">15</span></label><br>
     <input type="range" id="speed" min="2" max="15" value="15"><br>
     <fieldset>
       <legend>Color</legend>
@@ -38,30 +98,50 @@ input[type="text"] {width:80%; padding:8px; font-size:16px; margin-top:10px; bor
       <div class="color-circle" data-color="blue" style="background: blue;"></div>
       <div class="color-circle" data-color="yellow" style="background: yellow;"></div>
       <div class="color-circle" data-color="purple" style="background: purple;"></div>
-            <div class="color-circle" data-color="red" style="background: red;"></div>
-                  <div class="color-circle" data-color="red" style="background: white;"></div>
+      <div class="color-circle" data-color="red" style="background: red;"></div>
+      <div class="color-circle" data-color="white" style="background: white;"></div>
     </fieldset>
+    <p>This game is still developing...</p>
   </div>
+
 </div>
 
+<!-- ==== OYUN sagesi(full) ==== -->
 <canvas id="gameCanvas"></canvas>
 
 <script>
+/* ==== esas deyisenler ==== */
 var canvas=document.getElementById("gameCanvas");
 var ctx=canvas.getContext("2d");
-var grid=16,count=0,speed=15,playing=false;
-var snakeColor="lime",snakeLength=4;
-var snake={x:160,y:160,dx:grid,dy:0,cells:[],maxCells:snakeLength};
-var apple={x:320,y:320};
-var playerName="Player";
+var grid=16, count=0, speed=15, playing=false;
+var snakeColor="lime", snakeLength=4;
+var playerName="Player"; // defoult name
 
+// ilann obyektimiz
+var snake={
+  x:160, y:160, dx:grid, dy:0,
+  cells:[], maxCells:snakeLength
+};
+
+// Alma obyektimiz
+var apple={x:320, y:320};
+
+/* ==== funksiyalar ==== */
 function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
 window.addEventListener('resize',resizeCanvas);
 resizeCanvas();
 
 function getRandomInt(min,max){return Math.floor(Math.random()*(max-min))+min;}
-function resetGame(){snake.x=160;snake.y=160;snake.dx=grid;snake.dy=0;snake.cells=[];snake.maxCells=snakeLength;apple.x=getRandomInt(0,25)*grid;apple.y=getRandomInt(0,25)*grid;}
 
+function resetGame(){
+  snake.x=160; snake.y=160;
+  snake.dx=grid; snake.dy=0;
+  snake.cells=[]; snake.maxCells=snakeLength;
+  apple.x=getRandomInt(0,25)*grid;
+  apple.y=getRandomInt(0,25)*grid;
+}
+
+/* ==== reng secimi ==== */
 var colorCircles=document.querySelectorAll(".color-circle");
 colorCircles.forEach(function(c){
   c.addEventListener("click",function(){
@@ -71,19 +151,25 @@ colorCircles.forEach(function(c){
   });
 });
 
+/* ==== suret slider==== */
 var speedSlider=document.getElementById("speed");
 var speedVal=document.getElementById("speedVal");
-speedSlider.addEventListener("input",function(){speed=parseInt(this.value);speedVal.textContent=speed;});
+speedSlider.addEventListener("input",function(){
+  speed=parseInt(this.value);
+  speedVal.textContent=speed;
+});
+
 
 document.getElementById("playBtn").addEventListener("click",function(){
   var inputName=document.getElementById("nickname").value.trim();
   playerName=inputName?inputName:"Player";
   playing=true;
   document.getElementById("menusContainer").style.display="none";
-  document.getElementById("gameTitle").style.display="none"; // oyun adi gizlensin
+  document.getElementById("gameTitle").style.display="none"; // oyun adi gizlensin (playclicked)
   resetGame();
 });
 
+/* ==== idare etme - > WASD) ==== */
 document.addEventListener("keydown",function(e){
   if(!playing) return;
   if((e.key==="ArrowLeft"||e.key==="a")&&snake.dx===0){snake.dx=-grid;snake.dy=0;}
@@ -92,27 +178,62 @@ document.addEventListener("keydown",function(e){
   else if((e.key==="ArrowDown"||e.key==="s")&&snake.dy===0){snake.dy=grid;snake.dx=0;}
 });
 
+/* ==== esas game LOOP ==== */
 function loop(){
   requestAnimationFrame(loop);
   if(!playing) return;
-  if(++count<speed) return; count=0;
+  if(++count<speed) return;
+  count=0;
+
   ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // ilanin hreket cedveli
   snake.x+=snake.dx; snake.y+=snake.dy;
+
+  // Divara deyende olsun
   if(snake.x<0||snake.x>=canvas.width||snake.y<0||snake.y>=canvas.height){
-    playing=false;document.getElementById("menusContainer").style.display="flex";document.getElementById("gameTitle").style.display="block";resetGame();return;
+    playing=false;
+    document.getElementById("menusContainer").style.display="flex";
+    document.getElementById("gameTitle").style.display="block";
+    resetGame();
+    return;
   }
+
+  // ilanin huceyrenlerin goster
   snake.cells.unshift({x:snake.x,y:snake.y});
   if(snake.cells.length>snake.maxCells) snake.cells.pop();
-  ctx.fillStyle="red"; ctx.fillRect(apple.x,apple.y,grid-1,grid-1);
+
+  // Alma rengi
+  ctx.fillStyle="red";
+  ctx.fillRect(apple.x,apple.y,grid-1,grid-1);
+
+  // ilan rengi
   ctx.fillStyle=snakeColor;
   snake.cells.forEach(function(cell,index){
     ctx.fillRect(cell.x,cell.y,grid-1,grid-1);
-    if(cell.x===apple.x&&cell.y===apple.y){snake.maxCells++;apple.x=getRandomInt(0,25)*grid;apple.y=getRandomInt(0,25)*grid;}
-    for(var i=index+1;i<snake.cells.length;i++){if(cell.x===snake.cells[i].x&&cell.y===snake.cells[i].y){playing=false;document.getElementById("menusContainer").style.display="flex";document.getElementById("gameTitle").style.display="block";resetGame();}}
+
+    // Alma yeyende boyusun bla
+    if(cell.x===apple.x&&cell.y===apple.y){
+      snake.maxCells++;
+      apple.x=getRandomInt(0,25)*grid;
+      apple.y=getRandomInt(0,25)*grid;
+    }
+
+    // ilan ozun vursa
+    for(var i=index+1;i<snake.cells.length;i++){
+      if(cell.x===snake.cells[i].x&&cell.y===snake.cells[i].y){
+        playing=false;
+        document.getElementById("menusContainer").style.display="flex";
+        document.getElementById("gameTitle").style.display="block";
+        resetGame();
+      }
+    }
   });
-  // İlanın üstündə ad göstər
-  ctx.fillStyle="white"; ctx.font="20px Arial"; 
-  if(playing) ctx.fillText(playerName, snake.x, snake.y-10);
+
+  // Nickname snake in utundedi (name)
+  ctx.fillStyle="white";
+  ctx.font="20px Arial";
+  ctx.fillText(playerName, snake.x, snake.y-10);
 }
 requestAnimationFrame(loop);
 </script>
