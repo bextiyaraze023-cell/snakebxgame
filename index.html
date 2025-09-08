@@ -109,6 +109,142 @@
             border-radius: 5px;
             border: none;
         }
+        /* ——— Stil ——— */
+        
+        .cl-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
+            display: none;
+            z-index: 999999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+        
+        .cl-card {
+            width: min(780px, 92vw);
+            max-height: 86vh;
+            background: #0f1115;
+            color: #e9edf1;
+            border: 1px solid #2a2f3a;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .45);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cl-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: #131722;
+            border-bottom: 1px solid #2a2f3a;
+        }
+        
+        .cl-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .cl-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .cl-btn {
+            cursor: pointer;
+            border: 1px solid #2a2f3a;
+            background: #171b26;
+            color: #e9edf1;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+        
+        .cl-btn:hover {
+            background: #1d2230;
+        }
+        
+        .cl-content {
+            padding: 10px 16px 16px;
+            overflow: auto;
+            scrollbar-width: thin;
+        }
+        
+        .cl-item {
+            border: 1px solid #232836;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin: 10px 0;
+            background: #121621;
+        }
+        
+        .cl-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .cl-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 6px 0 10px;
+        }
+        
+        .cl-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid #2b3140;
+            background: #171b26;
+        }
+        
+        .cl-section {
+            margin: 6px 0;
+        }
+        
+        .cl-section h4 {
+            font-size: 12px;
+            letter-spacing: .2px;
+            text-transform: uppercase;
+            opacity: .85;
+            margin: 6px 0;
+        }
+        
+        .cl-list {
+            margin: 0;
+            padding-left: 18px;
+        }
+        
+        .cl-fab {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 999998;
+            background: #0f62fe;
+            color: white;
+            border: none;
+            outline: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(15, 98, 254, .35);
+        }
+        
+        .cl-fab:hover {
+            filter: brightness(1.05);
+        }
+        
+        .cl-muted {
+            opacity: .7;
+            font-size: 12px;
+        }
     </style>
 </head>
 
@@ -151,6 +287,25 @@
 
     </div>
 
+    <!-- Changelog açmaq üçün üzən düymə -->
+    <button id="cl-fab" class="cl-fab" title="Ctrl+L ilə aç">Changelog</button>
+
+    <!-- Overlay & Kart -->
+    <div id="cl-overlay" class="cl-overlay" role="dialog" aria-modal="true" aria-labelledby="cl-title">
+        <div class="cl-card">
+            <div class="cl-header">
+                <h3 id="cl-title">Changelog</h3>
+                <div class="cl-actions">
+                    <button id="cl-mark-read" class="cl-btn" title="Bu versiyanı oxunmuş kimi işarələ" disabled>Oxunmuş kimi işarələ</button>
+                    <button id="cl-close" class="cl-btn" title="Esc ilə də bağlana bilər">Bağla ✕</button>
+                </div>
+            </div>
+            <div id="cl-content" class="cl-content"></div>
+            <div style="padding:8px 16px; border-top:1px solid #2a2f3a; background:#131722" class="cl-muted">
+                Qısa yol: <b>Ctrl + L</b> aç, <b>Esc</b> bağla. Son versiya dəyişəndə avtomatik göstərilir.
+            </div>
+        </div>
+    </div>
     <!-- ==== OYUN sagesi(full) ==== -->
     <canvas id="gameCanvas"></canvas>
 
@@ -321,6 +476,179 @@
             ctx.fillText(playerName, snake.x, snake.y - 10);
         }
         requestAnimationFrame(loop);
+
+        /* ——— Məlumat (sənin verdiyinə oxşar struktur) ——— */
+        const CHANGELOGS = [{
+            version: "FINAL 1.4.5",
+            date: "08.09.25",
+            added: true,
+            remove: false,
+            fixed: true,
+            addedContent: ["Two new colors: red and white.", "Added changelog overlay with auto open on new version."],
+            removedContent: ["Touch die function."],
+            fixedContent: [
+                "If snake touch him own tail , he will no die."
+            ]
+        }, {
+            version: "1.4.1",
+            date: "04.09.25",
+            added: true,
+            remove: false,
+            fixed: false,
+            addedContent: ["snake Length, you can choose snake length before start game."],
+            removedContent: [],
+            fixedContent: []
+        }, {
+            version: "1.4.0",
+            date: "01.09.25",
+            added: false,
+            remove: false,
+            fixed: true,
+            addedContent: [],
+            removedContent: [],
+            fixedContent: ["Fixed same color select bug. Now you can select same color again."]
+        }, {
+            version: "1.3.4",
+            date: "27.08.25",
+            added: true,
+            remove: false,
+            fixed: true,
+            addedContent: ["Added color selection feature. and added 4 new colors: blue, yellow, purple, lime."],
+            removedContent: [],
+            fixedContent: ["Fixed Speed slider bug.", "Now speed slider works correctly."]
+        }, {
+            version: "1.4.0",
+            date: "021.08.25",
+            added: true,
+            remove: false,
+            fixed: true,
+            addedContent: ["Added player name feature."],
+            removedContent: [],
+            fixedContent: ["Changed game canvas to full screen."]
+        }];
+
+        /* ——— Köməkçi generatorlar ——— */
+        const liList = arr => {
+            if (!arr || !arr.length) return "<li>-</li>";
+            return arr.map(item => `<li>${sanitize(item)}</li>`).join("");
+        };
+
+        function sanitize(str) {
+            // Sadə XSS qorunması üçün
+            return String(str).replace(/[&<>"'`]/g, s => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                "\"": "&quot;",
+                "'": "&#39;",
+                "`": "&#96;"
+            }[s]));
+        }
+
+        /* ——— Render ——— */
+        function renderChangelog(logs) {
+            const wrap = document.createElement("div");
+            logs.forEach(cl => {
+                        const item = document.createElement("div");
+                        item.className = "cl-item";
+                        item.innerHTML = `
+      <div class="cl-title">[${sanitize(cl.version)}] — ${sanitize(cl.date)}</div>
+      <div class="cl-badges">
+        ${cl.added  ? `<span class="cl-badge">Added</span>`   : ""}
+        ${cl.remove ? `<span class="cl-badge">Removed</span>` : ""}
+        ${cl.fixed  ? `<span class="cl-badge">Fixed</span>`   : ""}
+      </div>
+      ${cl.added ? `
+        <div class="cl-section">
+          <h4>Added</h4>
+          <ul class="cl-list">${liList(cl.addedContent)}</ul>
+        </div>` : ""
+      }
+      ${cl.remove ? `
+        <div class="cl-section">
+          <h4>Removed</h4>
+          <ul class="cl-list">${liList(cl.removedContent)}</ul>
+        </div>` : ""
+      }
+      ${cl.fixed ? `
+        <div class="cl-section">
+          <h4>Fixed</h4>
+          <ul class="cl-list">${liList(cl.fixedContent)}</ul>
+        </div>` : ""
+      }
+    `;
+    wrap.appendChild(item);
+  });
+  return wrap.innerHTML;
+}
+
+/* ——— Aç/bağla məntiqi + localStorage ilə “yalnız yeni versiyada auto aç” ——— */
+const STORAGE_KEY = "changelog_last_version";
+
+function getLatestVersion(logs){
+  // Burda sadəcə ilk elementi "ən yeni" sayırıq (array-i yeni→köhnə sıralı saxla)
+  return logs && logs.length ? String(logs[0].version) : "0";
+}
+
+function openOverlay(){
+  document.getElementById("cl-overlay").style.display = "flex";
+}
+
+function closeOverlay(){
+  document.getElementById("cl-overlay").style.display = "none";
+}
+
+function markAsRead(version){
+  try { localStorage.setItem(STORAGE_KEY, version); } catch(e){}
+}
+
+function shouldAutoOpen(latest){
+  try {
+    const last = localStorage.getItem(STORAGE_KEY);
+    return last !== latest; // versiya dəyişibsə aç
+  } catch(e){ return true; }
+}
+
+/* ——— Başlat ——— */
+function initChangelog(logs = CHANGELOGS){
+  // İçeriyi doldur
+  const content = document.getElementById("cl-content");
+  content.innerHTML = renderChangelog(logs);
+
+  // Eventlər
+  const btnFab   = document.getElementById("cl-fab");
+  const btnClose = document.getElementById("cl-close");
+  const btnRead  = document.getElementById("cl-mark-read");
+  const overlay  = document.getElementById("cl-overlay");
+  const latest   = getLatestVersion(logs);
+
+  btnFab.onclick = openOverlay;
+  btnClose.onclick = closeOverlay;
+  btnRead.onclick = () => { markAsRead(latest); closeOverlay(); };
+
+  // Overlay fonuna kliklə də bağla (kartın kənarı)
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeOverlay();
+  });
+
+  // Klaviatura qısayolları
+  document.addEventListener("keydown", (e) => {
+    // Ctrl+L → aç
+    if ((e.ctrlKey || e.metaKey) && (e.key === "l" || e.key === "L")) {
+      e.preventDefault();
+      openOverlay();
+    }
+    // Esc → bağla
+    if (e.key === "Escape") closeOverlay();
+  });
+
+  // Avtomatik aç (yalnız yeni versiyada)
+  if (shouldAutoOpen(latest)) openOverlay();
+}
+
+// Birbaşa çalışdır
+initChangelog();
+/* ——— Son ——— */
     </script>
 </body>
 
